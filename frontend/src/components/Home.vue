@@ -1,61 +1,42 @@
 <template>
   <v-container>
     <v-row class="text-center">
-
       <v-col class="mb-4">
-        <h1 class="display-2 font-weight-bold mb-3">
-          Welcome to Vuetify
-        </h1>
-
-      </v-col>
-
-      <v-col
-        class="mb-5"
-        cols="12"
-      >
-        <h2 class="headline font-weight-bold mb-3">
-          Important Links
-        </h2>
-
-        <v-row justify="center">
-          <a
-            v-for="(link, i) in importantLinks"
-            :key="i"
-            :href="link.href"
-            class="subheading mx-3"
-            target="_blank"
-          >
-            {{ link.text }}
-          </a>
-        </v-row>
-      </v-col>
-
-      <v-col
-        class="mb-5"
-        cols="12"
-      >
-        <h2 class="headline font-weight-bold mb-3">
-          Ecosystem
-        </h2>
-
-        <v-row justify="center">
-          <a
-            v-for="(eco, i) in ecosystem"
-            :key="i"
-            :href="eco.href"
-            class="subheading mx-3"
-            target="_blank"
-          >
-            {{ eco.text }}
-          </a>
-        </v-row>
+        <h1 class="display-2 font-weight-bold mb-3">Welcome to Vuetify</h1>
       </v-col>
     </v-row>
+    <v-col xs12 sm8 md6>
+      <v-card 
+      flat
+        v-for="(article, i) in articles"
+        :key="i"
+        class="d-flex flex-nowrap py-2 pa-6 align-self-center"
+      >
+        <NewsCard v-bind:article="article" />
+      </v-card>
+    </v-col>
   </v-container>
 </template>
 
 <script>
-  export default {
-    name: 'Home',
+import NewsCard from "./NewsCard";
+export default {
+  name: "Home",
+  components: {
+    NewsCard
+  },
+  data() {
+    return {
+      articles: []
+    };
+  },
+  created() {
+    fetch("http://localhost:3000/eg")
+      .then(response => response.json())
+      .then(data => {
+        // console.log(data.articles);
+        this.articles = data.articles;
+      });
   }
+};
 </script>

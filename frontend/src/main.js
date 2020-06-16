@@ -4,11 +4,14 @@ import vuetify from './plugins/vuetify';
 import VueRouter from 'vue-router';
 import Home from './components/Home';
 import Login from './components/Login';
+import Register from './components/Register';
 
 Vue.use(VueRouter);
 
 const routes =[
   {path: '/home', component: Home},
+  {path: '/register', component: Register},
+  {path: '/login', component: Login},
   {path: '/', component: Login}
 ];
 

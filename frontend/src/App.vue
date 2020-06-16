@@ -14,35 +14,26 @@
       <v-spacer></v-spacer>
 
       <v-btn
-        target="_blank"
         text
+        href="/login"
       >
         <span class="mr-2">Login</span>
       </v-btn>
-      <v-btn
-        href='/register'
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Register</span>
-      </v-btn>
+      <v-btn text href="/register">Register</v-btn>
     </v-app-bar>
 
     <v-content>
-      <!-- <Home/> -->
       <router-view></router-view>
     </v-content>
   </v-app>
 </template>
 
 <script>
-// import Home from './components/Home';
 
 export default {
   name: 'App',
 
   components: {
-    // Home,
    },
   data: () => ({
     //
