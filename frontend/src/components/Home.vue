@@ -1,19 +1,34 @@
 <template>
   <v-container>
-    <v-row class="text-center">
-      <v-col class="mb-4">
-        <h1 class="display-2 font-weight-bold mb-3">Welcome to Vuetify</h1>
-      </v-col>
-    </v-row>
-    <v-col xs12 sm8 md6>
-      <v-card 
-      flat
-        v-for="(article, i) in articles"
-        :key="i"
-        class="d-flex flex-nowrap py-2 pa-6 align-self-center"
-      >
-        <NewsCard v-bind:article="article" />
-      </v-card>
+    <v-col>
+      <h1>Egypt Sports News</h1>
+      <v-divider></v-divider>
+      <v-carousel light height="500" hide-delimiters>
+        <v-carousel-item v-for="(article, i) in articlesEgSports" :key="i">
+          <NewsCard v-bind:article="article" />
+        </v-carousel-item>
+      </v-carousel>
+      <h1>Egypt Business News</h1>
+      <v-divider></v-divider>
+      <v-carousel light height="500" hide-delimiters>
+        <v-carousel-item v-for="(article, i) in articlesEgBusiness" :key="i">
+          <NewsCard v-bind:article="article" />
+        </v-carousel-item>
+      </v-carousel>
+      <h1>UAE Sports News</h1>
+      <v-divider></v-divider>
+      <v-carousel light height="500" hide-delimiters>
+        <v-carousel-item v-for="(article, i) in articlesAeSports" :key="i">
+          <NewsCard v-bind:article="article" />
+        </v-carousel-item>
+      </v-carousel>
+      <h1>UAE Business News</h1>
+      <v-divider></v-divider>
+      <v-carousel light height="500" hide-delimiters>
+        <v-carousel-item v-for="(article, i) in articlesAeBusiness" :key="i">
+          <NewsCard v-bind:article="article" />
+        </v-carousel-item>
+      </v-carousel>
     </v-col>
   </v-container>
 </template>
@@ -27,16 +42,32 @@ export default {
   },
   data() {
     return {
-      articles: []
+      articlesEgSports: [],
+      articlesEgBusiness: [],
+      articlesAeSports: [],
+      articlesAeBusiness: [],
     };
   },
-  created() {
-    fetch("http://localhost:3000/eg")
-      .then(response => response.json())
-      .then(data => {
-        // console.log(data.articles);
-        this.articles = data.articles;
-      });
+  async mounted() {
+    this.fetchUrl("eg", "sports").then(response => response.json()).then(data=>this.articlesEgSports = data.articles);
+    this.fetchUrl("eg", "business").then(response => response.json()).then(data=>this.articlesEgBusiness = data.articles);
+    this.fetchUrl("ae", "sports").then(response => response.json()).then(data=>this.articlesAeSports = data.articles);
+    this.fetchUrl("ae", "business").then(response => response.json()).then(data=>this.articlesAeBusiness = data.articles);
+  },
+  methods: {
+    fetchUrl(country, category) {
+      // let arr = new Array();
+      let data = { country, category };
+      return fetch("http://localhost:3000/news", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      })
+      // console.log(arr);
+      // return arr;
+    }
   }
 };
 </script>
