@@ -14,6 +14,7 @@
       <v-spacer></v-spacer>
 
       <v-btn
+      :hidden="this.hide"
         text
         href="/login"
       >
@@ -36,7 +37,11 @@ export default {
   components: {
    },
   data: () => ({
-    //
+    authToken: null,
+    hide: true
   }),
+  computed:()=>{
+    this.authToken = this.$store.getters.getAuthToken;
+  }
 };
 </script>

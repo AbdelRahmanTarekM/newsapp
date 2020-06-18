@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 
 Vue.use(Vuex);
 
-const url = 'http://localhost:3000/';
+// const url = 'http://localhost:3000/';
 
 export default new Vuex.Store({
     state:{
@@ -12,6 +12,7 @@ export default new Vuex.Store({
     },
     mutations: {
         setAuthToken(state,payload){
+            console.log('store',payload);
             state.authToken = payload;
         },
         setFavorites(state, payload){
