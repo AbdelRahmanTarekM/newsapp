@@ -3,6 +3,7 @@ const app = express();
 const cors = require('cors');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
 const User = require('./Models/User');
 const port = 3000;
 const NewsAPI = require('newsapi');
@@ -32,9 +33,55 @@ app.post('/news', (req, res) => {
     });
 });
 
-app.get('/', (req, res) => {
-    let user = new User({ name: 'Homie test', email: 'homie@email.test', password: 'xyz' });
-    user.save().then(result => console.log(result)).catch(err => console.log(err));
+app.post('/register', (req, res) => {
+    let name = req.body.name;
+    //Randomly generated password
+    let password = Math.random().toString(36).slice(-8);
+    console.log(password);
+    let email = req.body.email;
+    let birthDate = req.body.birthdate;
+    bcrypt.hash(password,8,(err,encryptedPassword)=>{
+        if(err){
+            console.log(err);
+        }else{
+            let user = new User({ name, email, password: encryptedPassword, birthDate });
+            user.save().then(result => {
+                console.log(result)
+                //TODO: send Password via nodemailer
+                res.send(result)
+            }).catch(err => {console.log(err); res.send({success: false})});
+        }
+    });
+});
+
+app.post('/login',(req,res)=>{
+    const email = req.body.email;
+    const password = req.body.password;
+    User.findOne({email})
+        .then(user=>{
+            if(!user){
+                res.send('user not found');
+            }
+            else{
+                bcrypt.compare(password, user.password,
+                    (err,same)=>{
+                        if(err){
+                            res.send('something went wrong');
+                        }else{
+                            if(!same){
+                                res.send('wrong password');
+                            }else{
+                                let authToken = Math.random().toString(36);
+                                user.authToken = authToken;
+                                user.save();
+                                res.send({authToken,favorites: user.favorites});
+                            }
+                        }
+                })
+            }
+        })
 })
+
+
 
 app.listen(port, () => console.log(`App listening at http://localhost:${port}`));
