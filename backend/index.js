@@ -40,48 +40,84 @@ app.post('/register', (req, res) => {
     console.log(password);
     let email = req.body.email;
     let birthDate = req.body.birthdate;
-    bcrypt.hash(password,8,(err,encryptedPassword)=>{
-        if(err){
+    bcrypt.hash(password, 8, (err, encryptedPassword) => {
+        if (err) {
             console.log(err);
-        }else{
+        } else {
             let user = new User({ name, email, password: encryptedPassword, birthDate });
             user.save().then(result => {
                 console.log(result)
                 //TODO: send Password via nodemailer
                 res.send(result)
-            }).catch(err => {console.log(err); res.send({success: false})});
+            }).catch(err => { console.log(err); res.send({ success: false }) });
         }
     });
 });
 
-app.post('/login',(req,res)=>{
+app.post('/login', (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
-    User.findOne({email})
-        .then(user=>{
-            if(!user){
+    User.findOne({ email })
+        .then(user => {
+            if (!user) {
                 res.send('user not found');
             }
-            else{
+            else {
                 bcrypt.compare(password, user.password,
-                    (err,same)=>{
-                        if(err){
+                    (err, same) => {
+                        if (err) {
                             res.send('something went wrong');
-                        }else{
-                            if(!same){
+                        } else {
+                            if (!same) {
                                 res.send('wrong password');
-                            }else{
+                            } else {
                                 let authToken = Math.random().toString(36);
                                 user.authToken = authToken;
                                 user.save();
-                                res.send({authToken,favorites: user.favorites});
+                                res.send({ authToken, favorites: user.favorites });
                             }
                         }
-                })
+                    })
             }
         })
 })
 
+app.post('/favorites/add', (req, res) => {
+    const authToken = req.body.authToken;
+    const urlToImage = req.body.urlToImage;
+    const title = req.body.title;
+    const author = req.body.author;
+    const publishedAt = req.body.publishedAt;
+    const description = req.body.description;
+    const url = req.body.url;
 
+    User.findOne({ authToken })
+        .then(user => {
+            if(!user){
+                res.send('bad request');
+            }else{
+                user.favorites.push({urlToImage,title,author,publishedAt,description,url});
+                user.save()
+                res.send(user.favorites);
+            }
+        })
+})
 
+app.post('/favorites/remove', (req,res)=>{
+    const authToken = req.body.authToken;
+    const id = req.body._id;
+
+    User.findOne({authToken})
+        .then(user=>{
+            if(!user){
+                res.send('bad request')
+            } else {
+                user.favorites = user.favorites.filter((value,i,arr)=>{
+                    return value._id != id;
+                });
+                user.save();
+                res.send(user.favorites);
+            }
+        })
+})
 app.listen(port, () => console.log(`App listening at http://localhost:${port}`));
