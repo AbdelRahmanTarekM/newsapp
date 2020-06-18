@@ -1,7 +1,7 @@
 <template>
   <v-container class="justify-center" fluid px-12 mb-3 mt-3>
     <v-form ref="form" v-model="valid">
-      <v-text-field v-model="name" :counter="10" :rules="nameRules" label="Name" required></v-text-field>
+      <v-text-field v-model="name" :counter="16" :rules="nameRules" label="Name" required></v-text-field>
       <v-text-field v-model="email" :rules="emailRules" label="E-mail" required></v-text-field>
       <v-date-picker
         v-model="date"
@@ -25,7 +25,7 @@ export default {
     name: "",
     nameRules: [
       v => !!v || "Name is required",
-      v => (v && v.length <= 10) || "Name must be less than 10 characters"
+      v => (v && v.length <= 16) || "Name must be less than 16 characters"
     ],
     email: "",
     emailRules: [
@@ -37,7 +37,20 @@ export default {
   methods: {
     validate() {
       this.$refs.form.validate();
-      console.log('name', this.name, 'email', this.email, "date", this.date);
+      let data = {name: this.name, email: this.email, birthdate: this.date};
+    //   console.log("name", this.name, "email", this.email, "date", this.date);
+      fetch("http://localhost:3000/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      }).then(response => response.json())
+        .then(data => {
+            if(data.success){
+                this.$router.push({name: 'login'})
+            }
+        });
     },
     reset() {
       this.$refs.form.reset();

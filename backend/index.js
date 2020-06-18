@@ -4,6 +4,8 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
+require('dotenv').config();
 const User = require('./Models/User');
 const port = 3000;
 const NewsAPI = require('newsapi');
@@ -37,7 +39,6 @@ app.post('/register', (req, res) => {
     let name = req.body.name;
     //Randomly generated password
     let password = Math.random().toString(36).slice(-8);
-    console.log(password);
     let email = req.body.email;
     let birthDate = req.body.birthdate;
     bcrypt.hash(password, 8, (err, encryptedPassword) => {
@@ -46,9 +47,36 @@ app.post('/register', (req, res) => {
         } else {
             let user = new User({ name, email, password: encryptedPassword, birthDate });
             user.save().then(result => {
-                console.log(result)
                 //TODO: send Password via nodemailer
-                res.send(result)
+                const smtpTrans = nodemailer.createTransport({
+                    host: 'smtp.gmail.com',
+                    port: 465,
+                    secure: true,
+                    auth: {
+                        user: process.env.GMAIL_USER,
+                        pass: process.env.USER_PASS
+                    },
+                    tls: {
+                        // do not fail on invalid certs
+                        rejectUnauthorized: false
+                    }
+                });
+
+                const mailOptions = {
+                    from: 'News App',
+                    to: `${email}`,
+                    subject: `News App Password`,
+                    text: `
+                        Name: ${name}
+                         Email:${email}
+                         Password: ${password}
+                          `
+                };
+
+                smtpTrans.sendMail(mailOptions, (err, res)=>{
+                    err?console.log(err):console.log('success')
+                })
+                res.send({result, success: true})
             }).catch(err => { console.log(err); res.send({ success: false }) });
         }
     });
